@@ -37,6 +37,7 @@ WriteMakefile(
         'Navel::Logger' => 0,
         'AnyEvent' => 0,
         'AnyEvent::Fork' => 0,
+        'AnyEvent::Fork::RPC' => 0,
         'Promises' => 0,
         'Mojolicious' => 0
     },
