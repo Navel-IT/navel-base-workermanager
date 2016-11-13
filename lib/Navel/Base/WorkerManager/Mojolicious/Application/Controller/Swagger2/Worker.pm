@@ -40,7 +40,7 @@ sub show {
     );
 }
 
-sub new {
+sub create {
     my ($controller, $arguments, $callback) = @_;
 
     return $controller->resource_already_exists(
