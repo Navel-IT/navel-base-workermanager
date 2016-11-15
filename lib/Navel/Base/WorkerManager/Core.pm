@@ -66,7 +66,7 @@ sub delete_worker_and_definition_associated_by_name {
 sub delete_workers {
     my $self = shift;
 
-    $self->delete_worker_and_definition_associated_by_name($_->{name}) for @{$self->{definitions}->{definitions}};
+    $self->delete_worker_and_definition_associated_by_name($_->{name}) for my @names = @{$self->{definitions}->{definitions}};
 
     $self;
 }
