@@ -5,23 +5,23 @@
 
 #-> initialization
 
-package Navel::Base::WorkerManager::Mojolicious::Application::Controller::Swagger2::Backup 0.1;
+package Navel::Base::WorkerManager::Mojolicious::Application::Controller::OpenAPI::Configuration 0.1;
 
 use Navel::Base;
 
 use Mojo::Base 'Mojolicious::Controller';
 
-use parent 'Navel::Base::Daemon::Mojolicious::Application::Controller::Swagger2::Backup';
+use parent 'Navel::Base::Daemon::Mojolicious::Application::Controller::OpenAPI::Configuration';
 
 #-> methods
 
-sub save_all_configuration {
+sub save {
     my $controller = shift;
 
-    $controller->SUPER::save_all_configuration(
-        @_,
+    $controller->SUPER::save(
         $controller->daemon->{core}->{definitions}->async_write,
-        $controller->daemon->{core}->{meta}->async_write
+        $controller->daemon->{core}->{meta}->async_write,
+        @_
     );
 }
 
@@ -41,7 +41,7 @@ __END__
 
 =head1 NAME
 
-Navel::Base::WorkerManager::Mojolicious::Application::Controller::Swagger2::Backup
+Navel::Base::WorkerManager::Mojolicious::Application::Controller::OpenAPI::Configuration
 
 =head1 COPYRIGHT
 
