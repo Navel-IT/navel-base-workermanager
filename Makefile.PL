@@ -19,7 +19,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Navel/Base/WorkerManager.pm',
     ABSTRACT => 'navel-base-workermanager',
     AUTHOR => 'Yoann Le Garff, Nicolas Boquet and Yann Le Bras',
-    LICENSE => 'Apache License, Version 2.0',
+    LICENSE => 'apache_2_0',
     META_MERGE => {
         requires => {
             perl => $min_perl_version
