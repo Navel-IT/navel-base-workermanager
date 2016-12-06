@@ -11,7 +11,137 @@ use Navel::Base;
 
 use Mojo::Base 'Mojolicious::Controller';
 
+use Navel::Utils 'croak';
+
+use Promises 'collect';
+
 #-> methods
+
+sub _show_associated_queue {
+    my ($controller, $action) = (shift->openapi->valid_input || return, shift);
+
+    croak('action must be defined') unless defined $action;
+
+    my $name = $controller->validation->param('name');
+
+    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+
+    return $controller->resource_not_found($name) unless defined $definition;
+
+    $controller->render_later;
+
+    $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->rpc(undef, $action)->then(
+        sub {
+            $controller->render(
+                openapi => {
+                    amount_of_events => shift
+                },
+                status => 200
+            );
+        }
+    )->catch(
+        sub {
+            $controller->render(
+                openapi => $controller->ok_ko(
+                    [],
+                    [
+                        $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.'
+                    ]
+                ),
+                status => 500
+            );
+        }
+    );
+}
+
+sub _delete_all_events_from_associated_queue {
+    my ($controller, $action) = (shift->openapi->valid_input || return, shift);
+
+    croak('action must be defined') unless defined $action;
+
+    my $name = $controller->validation->param('name');
+
+    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+
+    return $controller->resource_not_found($name) unless defined $definition;
+
+    $controller->render_later;
+
+    my (@ok, @ko);
+
+    $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->rpc(undef, $action)->then(
+        sub {
+            push @ok, $definition->full_name . ': queue cleared (' . $action . ').';
+        }
+    )->catch(
+        sub {
+            push @ko, $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.';
+        }
+    )->finally(
+        sub {
+            $controller->render(
+                openapi => $controller->ok_ko(\@ok, \@ko),
+                status => @ko ? 500 : 200
+            );
+        }
+    );
+}
+
+sub _show_associated_pubsub_connection_status {
+    my ($controller, $backend) = (shift->openapi->valid_input || return, shift);
+
+    croak('action must be defined') unless defined $action;
+
+    my $name = $controller->validation->param('name');
+
+    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+
+    return $controller->resource_not_found($name) unless defined $definition;
+
+    my $worker_worker = $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}};
+
+    $controller->render_later;
+
+    my $connectable;
+
+    $worker_worker->rpc($definition->{$backend}, 'is_connectable')->then(
+        sub {
+            collect(
+                $worker_worker->rpc($definition->{$backend}, 'is_connecting'),
+                $worker_worker->rpc($definition->{$backend}, 'is_connected'),
+                $worker_worker->rpc($definition->{$backend}, 'is_disconnecting'),
+                $worker_worker->rpc($definition->{$backend}, 'is_disconnected')
+            ) if $connectable = shift;
+        }
+    )->then(
+        sub {
+            my %status;
+
+            ($status{connecting}, $status{connected}, $status{disconnecting}, $status{disconnected}) = @_;
+
+            $status{$_} = $status{$_}->[0] ? 1 : 0 for keys %status;
+
+            $status{connectable} = $connectable ? 1 : 0;
+
+            $controller->render(
+                openapi => \%status,
+                status => 200
+            );
+        }
+    )->catch(
+        sub {
+            $controller->render(
+                openapi => $controller->ok_ko(
+                    [],
+                    [
+                        $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.'
+                    ]
+                ),
+                status => 500
+            );
+        }
+    );
+}
 
 sub list {
     my $controller = shift->openapi->valid_input || return;
