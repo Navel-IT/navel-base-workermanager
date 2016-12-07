@@ -90,7 +90,7 @@ sub _delete_all_events_from_associated_queue {
 sub _show_associated_pubsub_connection_status {
     my ($controller, $backend) = (shift->openapi->valid_input || return, shift);
 
-    croak('action must be defined') unless defined $action;
+    croak('backend must be defined') unless defined $backend;
 
     my $name = $controller->validation->param('name');
 
