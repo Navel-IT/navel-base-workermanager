@@ -78,12 +78,16 @@ sub new {
     $self;
 }
 
+sub is_healthy {
+    defined shift->{rpc} || 0;
+}
+
 sub rpc {
     my $self = shift;
 
     my $deferred = deferred;
 
-    if (defined $self->{rpc}) {
+    if ($self->is_healthy) {
         my @definitions;
 
         unless ($self->{initialized}) {
@@ -100,7 +104,7 @@ sub rpc {
             }
         );
     } else {
-        $deferred->reject('the worker is not ready');
+        $deferred->reject('the worker is broken');
     }
 
     $deferred->promise;

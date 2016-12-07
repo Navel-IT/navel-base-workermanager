@@ -274,6 +274,24 @@ sub delete {
     );
 }
 
+sub show_worker_status {
+    my $controller = shift->openapi->valid_input || return;
+
+    my $name = $controller->validation->param('name');
+
+    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+
+    return $controller->resource_not_found($name) unless defined $definition;
+
+    $controller->render(
+        openapi => {
+            initialized => $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->{initialized},
+            healthy => $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->is_healthy
+        },
+        status => 200
+    );
+}
+
 # sub AUTOLOAD {}
 
 # sub DESTROY {}
