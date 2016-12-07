@@ -45,6 +45,8 @@ sub new {
         }, $class;
     }
 
+    $self->{initialized} = 0;
+
     my $weak_self = $self;
 
     weaken($weak_self);
@@ -69,7 +71,6 @@ sub new {
         },
         on_destroy => $options{on_destroy},
         async => 1,
-        initialized => 0,
         serialiser => Navel::AnyEvent::Fork::RPC::Serializer::Sereal::SERIALIZER
     );
 
