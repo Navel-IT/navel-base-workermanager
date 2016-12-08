@@ -82,7 +82,7 @@ sub new {
 sub is_healthy {
     my $self = shift;
 
-    blessed($self->{rpc}) && $self->{rpc}->isa('AnyEvent::Fork::RPC') || 0;
+    defined $self->{rpc} || 0;
 }
 
 sub rpc {
