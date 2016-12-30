@@ -15,7 +15,7 @@ use AnyEvent::Fork::RPC;
 use Promises 'deferred';
 
 use Navel::Logger::Message;
-use Navel::AnyEvent::Fork::RPC::Serializer::Sereal;
+use AnyEvent::Fork::RPC::Serializer::Sereal;
 
 use Navel::Utils qw/
     blessed
@@ -71,7 +71,7 @@ sub new {
         },
         on_destroy => $options{on_destroy},
         async => 1,
-        serialiser => Navel::AnyEvent::Fork::RPC::Serializer::Sereal::SERIALIZER
+        serialiser => AnyEvent::Fork::RPC::Serializer::Sereal::SERIALIZER
     );
 
     $self->{core}->{logger}->info($self->{definition}->full_name . ': spawned a new worker.');

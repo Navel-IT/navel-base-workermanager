@@ -33,7 +33,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Navel::Base' => 0,
         'Navel::Base::Daemon' => 0,
-        'Navel::AnyEvent::Fork::RPC::Serializer::Sereal' => 0,
+        'AnyEvent::Fork::RPC::Serializer::Sereal' => 0,
         'Navel::Logger' => 0,
         'AnyEvent' => 0,
         'AnyEvent::Fork' => 0,
