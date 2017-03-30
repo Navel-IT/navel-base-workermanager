@@ -10,11 +10,12 @@ package Navel::Base::WorkerManager::Core::Worker::Fork 0.1;
 use Navel::Base;
 
 use AnyEvent::Fork;
-use AnyEvent::Fork::RPC 1.23;
+use AnyEvent::Fork::RPC;
 
 use Promises 'deferred';
 
 use Navel::Logger::Message;
+use AnyEvent::Fork::RPC::Serializer::Cpanel::JSON::XS;
 
 use Navel::Utils qw/
     blessed
@@ -70,7 +71,7 @@ sub new {
         },
         on_destroy => $options{on_destroy},
         async => 1,
-        serialiser => $AnyEvent::Fork::RPC::CBOR_XS_SERIALISER
+        serialiser => $AnyEvent::Fork::RPC::Serializer::Cpanel::JSON::XS::SERIALIZER
     );
 
     $self->{core}->{logger}->info($self->{definition}->full_name . ': spawned a new worker.');
