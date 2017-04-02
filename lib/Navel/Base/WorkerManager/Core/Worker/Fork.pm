@@ -71,7 +71,7 @@ sub new {
         },
         on_destroy => $options{on_destroy},
         async => 1,
-        serialiser => $AnyEvent::Fork::RPC::Serializer::Cpanel::JSON::XS::SERIALIZER
+        serialiser => AnyEvent::Fork::RPC::Serializer::Cpanel::JSON::XS::SERIALIZER
     );
 
     $self->{core}->{logger}->info($self->{definition}->full_name . ': spawned a new worker.');
