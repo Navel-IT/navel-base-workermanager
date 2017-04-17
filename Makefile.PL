@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker;
 
 #-> main
 
-my $min_perl_version = '5.18.0';
+my $min_perl_version = '5.20.0';
 
 WriteMakefile(
     NAME => 'Navel::Base::WorkerManager',
