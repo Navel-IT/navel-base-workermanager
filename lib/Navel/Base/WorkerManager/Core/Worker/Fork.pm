@@ -118,8 +118,6 @@ sub rpc {
 sub DESTROY {
     my $self = shift;
 
-    local $@;
-
     eval {
         $self->rpc;
 

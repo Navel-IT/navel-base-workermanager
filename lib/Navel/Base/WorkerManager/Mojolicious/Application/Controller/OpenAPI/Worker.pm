@@ -176,8 +176,6 @@ sub create {
 
     my (@ok, @ko);
 
-    local $@;
-
     $definition = eval {
         $controller->daemon->{core}->{definitions}->add_definition($definition);
     };
@@ -209,8 +207,6 @@ sub update {
     return $controller->resource_not_found($name) unless defined $definition;
 
     my (@ok, @ko);
-
-    local $@;
 
     delete $base_definition->{name};
 
@@ -255,8 +251,6 @@ sub delete {
     return $controller->resource_not_found($name) unless defined $definition;
 
     my (@ok, @ko);
-
-    local $@;
 
     eval {
         $controller->daemon->{core}->delete_worker_and_definition_associated_by_name($definition->{name});
