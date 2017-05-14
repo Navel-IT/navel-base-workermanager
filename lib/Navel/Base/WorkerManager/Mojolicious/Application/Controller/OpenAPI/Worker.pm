@@ -42,7 +42,7 @@ sub _show_associated_queue {
     )->catch(
         sub {
             $controller->render(
-                openapi => $controller->navel->logger->ok(
+                openapi => $controller->navel->logger->ok_ko(
                     [],
                     [
                         $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.'
@@ -80,7 +80,7 @@ sub _delete_all_events_from_associated_queue {
     )->finally(
         sub {
             $controller->render(
-                openapi => $controller->navel->logger->ok(\@ok, \@ko),
+                openapi => $controller->navel->logger->ok_ko(\@ok, \@ko),
                 status => @ko ? 500 : 200
             );
         }
@@ -131,7 +131,7 @@ sub _show_associated_pubsub_connection_status {
     )->catch(
         sub {
             $controller->render(
-                openapi => $controller->navel->logger->ok(
+                openapi => $controller->navel->logger->ok_ko(
                     [],
                     [
                         $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.'
@@ -189,7 +189,7 @@ sub create {
     }
 
     $controller->render(
-        openapi => $controller->navel->logger->ok(\@ok, \@ko),
+        openapi => $controller->navel->logger->ok_ko(\@ok, \@ko),
         status => @ko ? 400 : 201
     );
 }
@@ -236,7 +236,7 @@ sub update {
     }
 
     $controller->render(
-        openapi => $controller->navel->logger->ok(\@ok, \@ko),
+        openapi => $controller->navel->logger->ok_ko(\@ok, \@ko),
         status => @ko ? 400 : 200
     );
 }
@@ -263,7 +263,7 @@ sub delete {
     }
 
     $controller->render(
-        openapi => $controller->navel->logger->ok(\@ok, \@ko),
+        openapi => $controller->navel->logger->ok_ko(\@ok, \@ko),
         status => @ko ? 400 : 200
     );
 }
