@@ -24,13 +24,13 @@ sub _show_associated_queue {
 
     my $name = $controller->validation->param('name');
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
     $controller->render_later;
 
-    $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->rpc(undef, $action)->then(
+    $controller->navel->daemon->{core}->{worker_per_definition}->{$definition->{name}}->rpc(undef, $action)->then(
         sub {
             $controller->render(
                 openapi => {
@@ -61,7 +61,7 @@ sub _delete_all_events_from_associated_queue {
 
     my $name = $controller->validation->param('name');
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
@@ -69,7 +69,7 @@ sub _delete_all_events_from_associated_queue {
 
     my (@ok, @ko);
 
-    $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->rpc(undef, $action)->then(
+    $controller->navel->daemon->{core}->{worker_per_definition}->{$definition->{name}}->rpc(undef, $action)->then(
         sub {
             push @ok, $definition->full_name . ': queue cleared (' . $action . ').';
         }
@@ -94,11 +94,11 @@ sub _show_associated_pubsub_connection_status {
 
     my $name = $controller->validation->param('name');
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
-    my $worker_worker = $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}};
+    my $worker_worker = $controller->navel->daemon->{core}->{worker_per_definition}->{$definition->{name}};
 
     $controller->render_later;
 
@@ -147,7 +147,7 @@ sub list {
     my $controller = shift->openapi->valid_input || return;
 
     $controller->render(
-        openapi => $controller->daemon->{core}->{definitions}->all_by_property_name('name'),
+        openapi => $controller->navel->daemon->{core}->{definitions}->all_by_property_name('name'),
         status => 200
     );
 }
@@ -157,7 +157,7 @@ sub show {
 
     my $name = $controller->validation->param('name');
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_properties_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_properties_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
@@ -172,16 +172,16 @@ sub create {
 
     my $definition = $controller->validation->param('definition');
 
-    return $controller->navel->api->responses->resource_already_exists($definition->{name}) if defined $controller->daemon->{core}->{definitions}->definition_by_name($definition->{name});
+    return $controller->navel->api->responses->resource_already_exists($definition->{name}) if defined $controller->navel->daemon->{core}->{definitions}->definition_by_name($definition->{name});
 
     my (@ok, @ko);
 
     $definition = eval {
-        $controller->daemon->{core}->{definitions}->add_definition($definition);
+        $controller->navel->daemon->{core}->{definitions}->add_definition($definition);
     };
 
     unless ($@) {
-        $controller->daemon->{core}->init_worker_by_name($definition->{name})->register_worker_by_name($definition->{name});
+        $controller->navel->daemon->{core}->init_worker_by_name($definition->{name})->register_worker_by_name($definition->{name});
 
         push @ok, $definition->full_name . ': added.';
     } else {
@@ -202,7 +202,7 @@ sub update {
         $controller->validation->param('baseDefinition')
     );
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
@@ -216,16 +216,16 @@ sub update {
     };
 
     eval {
-        $controller->daemon->{core}->delete_worker_and_definition_associated_by_name($merged_definition->{name});
+        $controller->navel->daemon->{core}->delete_worker_and_definition_associated_by_name($merged_definition->{name});
     };
 
     unless ($@) {
         $definition = eval {
-            $controller->daemon->{core}->{definitions}->add_definition($merged_definition);
+            $controller->navel->daemon->{core}->{definitions}->add_definition($merged_definition);
         };
 
         unless ($@) {
-            $controller->daemon->{core}->init_worker_by_name($definition->{name})->register_worker_by_name($definition->{name});
+            $controller->navel->daemon->{core}->init_worker_by_name($definition->{name})->register_worker_by_name($definition->{name});
 
             push @ok, $definition->full_name . ': updated.';
         } else {
@@ -246,14 +246,14 @@ sub delete {
 
     my $name = $controller->validation->param('name');
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
     my (@ok, @ko);
 
     eval {
-        $controller->daemon->{core}->delete_worker_and_definition_associated_by_name($definition->{name});
+        $controller->navel->daemon->{core}->delete_worker_and_definition_associated_by_name($definition->{name});
     };
 
     unless ($@) {
@@ -273,14 +273,14 @@ sub show_worker_status {
 
     my $name = $controller->validation->param('name');
 
-    my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
+    my $definition = $controller->navel->daemon->{core}->{definitions}->definition_by_name($name);
 
     return $controller->navel->api->responses->resource_not_found($name) unless defined $definition;
 
     $controller->render(
         openapi => {
-            initialized => $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->{initialized},
-            healthy => $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}}->is_healthy
+            initialized => $controller->navel->daemon->{core}->{worker_per_definition}->{$definition->{name}}->{initialized},
+            healthy => $controller->navel->daemon->{core}->{worker_per_definition}->{$definition->{name}}->is_healthy
         },
         status => 200
     );

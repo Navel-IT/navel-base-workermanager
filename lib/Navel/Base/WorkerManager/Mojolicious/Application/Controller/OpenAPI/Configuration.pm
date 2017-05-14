@@ -19,8 +19,8 @@ sub save {
     my $controller = shift;
 
     $controller->SUPER::save(
-        $controller->daemon->{core}->{definitions}->async_write,
-        $controller->daemon->{core}->{meta}->async_write,
+        $controller->navel->daemon->{core}->{definitions}->async_write,
+        $controller->navel->daemon->{core}->{meta}->async_write,
         @_
     );
 }
