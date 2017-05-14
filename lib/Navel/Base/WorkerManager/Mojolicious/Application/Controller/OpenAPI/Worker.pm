@@ -26,7 +26,7 @@ sub _show_associated_queue {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     $controller->render_later;
 
@@ -42,7 +42,7 @@ sub _show_associated_queue {
     )->catch(
         sub {
             $controller->render(
-                openapi => $controller->ok_ko(
+                openapi => $controller->navel->logger->ok(
                     [],
                     [
                         $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.'
@@ -63,7 +63,7 @@ sub _delete_all_events_from_associated_queue {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     $controller->render_later;
 
@@ -80,7 +80,7 @@ sub _delete_all_events_from_associated_queue {
     )->finally(
         sub {
             $controller->render(
-                openapi => $controller->ok_ko(\@ok, \@ko),
+                openapi => $controller->navel->logger->ok(\@ok, \@ko),
                 status => @ko ? 500 : 200
             );
         }
@@ -96,7 +96,7 @@ sub _show_associated_pubsub_connection_status {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     my $worker_worker = $controller->daemon->{core}->{worker_per_definition}->{$definition->{name}};
 
@@ -131,7 +131,7 @@ sub _show_associated_pubsub_connection_status {
     )->catch(
         sub {
             $controller->render(
-                openapi => $controller->ok_ko(
+                openapi => $controller->navel->logger->ok(
                     [],
                     [
                         $definition->full_name . ': ' . (@_ ? join ', ', @_ : 'unexpected error') . '.'
@@ -159,7 +159,7 @@ sub show {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_properties_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     $controller->render(
         openapi => $definition,
@@ -172,7 +172,7 @@ sub create {
 
     my $definition = $controller->validation->param('definition');
 
-    return $controller->resource_already_exists($definition->{name}) if defined $controller->daemon->{core}->{definitions}->definition_by_name($definition->{name});
+    return $controller->navel->stdresponses->resource_already_exists($definition->{name}) if defined $controller->daemon->{core}->{definitions}->definition_by_name($definition->{name});
 
     my (@ok, @ko);
 
@@ -189,7 +189,7 @@ sub create {
     }
 
     $controller->render(
-        openapi => $controller->ok_ko(\@ok, \@ko),
+        openapi => $controller->navel->logger->ok(\@ok, \@ko),
         status => @ko ? 400 : 201
     );
 }
@@ -204,7 +204,7 @@ sub update {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     my (@ok, @ko);
 
@@ -236,7 +236,7 @@ sub update {
     }
 
     $controller->render(
-        openapi => $controller->ok_ko(\@ok, \@ko),
+        openapi => $controller->navel->logger->ok(\@ok, \@ko),
         status => @ko ? 400 : 200
     );
 }
@@ -248,7 +248,7 @@ sub delete {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     my (@ok, @ko);
 
@@ -263,7 +263,7 @@ sub delete {
     }
 
     $controller->render(
-        openapi => $controller->ok_ko(\@ok, \@ko),
+        openapi => $controller->navel->logger->ok(\@ok, \@ko),
         status => @ko ? 400 : 200
     );
 }
@@ -275,7 +275,7 @@ sub show_worker_status {
 
     my $definition = $controller->daemon->{core}->{definitions}->definition_by_name($name);
 
-    return $controller->resource_not_found($name) unless defined $definition;
+    return $controller->navel->stdresponses->resource_not_found($name) unless defined $definition;
 
     $controller->render(
         openapi => {
